@@ -137,8 +137,9 @@ bash
 cd frontend
 npm install
 npm start
-Open your browser to http://localhost:3000 to interact with the system console canvas.
 ```
+Open your browser to http://localhost:3000 to interact with the system console canvas.
+
 ## 📜 Licensing & Project Scope
 This project is shared under the official open-source MIT License. Built as a comprehensive systems engineering project demonstrating robust data extraction, cleaning pipelines, web socket rendering optimization, and geospatial dashboard tracking architectures.
 ---
