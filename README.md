@@ -10,105 +10,102 @@ This system acts as an operational situational control room, replacing abstract 
 
 The ecosystem relies on a decoupled, asynchronous microservice framework designed for low latency, zero memory leaks, and structural reliability:
 
-┌────────────────────────┐
-              │   stream_worker.py     │  (IoT Node Simulator)
-              └────────────────────────┘
-                           │
-                           │ Writes JSON Batches (Every 3s)
-                           ▼
-              ┌────────────────────────┐
-              │    MongoDB Container   │  (Time-Series Data Lake)
-              └────────────────────────┘
-                           ▲
-                           │ Reads Raw Streams
-                           │
-              ┌────────────────────────┐
-              │    FastAPI (main.py)   │  (Gateway / Inference Node)
-              └────────────────────────┘
-                           │
-                           │ Exposes JSON REST Endpoints
-                           │ Streams RAM-Buffered Matplotlib/Seaborn
-                           ▼
-              ┌────────────────────────┐
-              │     React Frontend     │  (Leaflet GIS / Recharts Canvas)
-              └────────────────────────┘
-
-
-1. **The Ingestion Worker (`stream_worker.py`)**: A standalone background process mimicking real-world IoT cellular forestry nodes. It continuously generates localized weather parameters specific to each park's micro-climate profile (including circadian day/night temperature cycles and randomized precipitation triggers) and writes payloads directly into MongoDB every 3 seconds.
-2. **The Database Data Lake (MongoDB)**: A containerized database hosting time-series geospatial collections, completely independent of the web application layer.
-3. **The Gateway REST API Engine (`main.py`)**: Built with FastAPI. It performs database reads, sanitizes input variables via Pandas to handle data-type anomalies, and executes the rule-based prediction vectors. Additionally, it handles analytical rendering tasks directly inside an in-memory RAM buffer (`io.BytesIO`) to protect the server's hard drive from repetitive high-frequency writes.
-4. **The Client Control Deck (React)**: A single-page dashboard utilizing **react-leaflet** to project actual GPS points on an interactive OpenStreetMap layer and **recharts** to render smooth, real-time sliding timeline graphs.
-
----
-
-## ⛰️ Tracked Real-Earth Coordinates
-
-The system tracks 5 high-risk wildlife reserves with precise physical geospatial points:
-* **Mudumalai National Park** (Tamil Nadu) ── `11.5622° N, 76.5345° E`
-* **Bandipur Tiger Reserve** (Karnataka) ── `11.6640° N, 76.6291° E`
-* **Anamalai Tiger Reserve** (Tamil Nadu) ── `10.3950° N, 76.9647° E`
-* **Wayanad Wildlife Sanctuary** (Kerala) ── `11.6923° N, 76.2422° E`
-* **Silent Valley National Park** (Kerala) ── `11.1300° N, 76.4300° E`
-
----
-
-## 🧠 The Mathematical Inference Engine
-
-Instead of using an opaque, heavy machine learning model that introduces system latency, risk indices are predicted dynamically using a **deterministic, rule-based piecewise vector matrix** tracking weather extremities:
-
-┌──────────────────────────┐
-                  │ Raw Telemetry Ingestion  │ (T, H, W, R)
-                  └────────────┬─────────────┘
+```text
+                  ┌────────────────────────┐
+                  │   stream_worker.py     │  (IoT Node Simulator)
+                  └────────────────────────┘
                                │
+                               │ Writes JSON Batches (Every 3s)
                                ▼
-               🌲 Are Conditions Extreme? 🌲
-                 (T >= 38°C  &  H <= 20%)
-                 /                        \
-               YES                        NO
-               /                            \
-              ▼                              ▼
- ┌────────────────────────┐     🌧️ Is Active Rain Falling? 🌧️
- │ Extreme Danger Vector  │               (Rain > 0mm)
- │ (T * 1.5) + (W * 0.5)  │               /          \
- └────────────────────────┘             YES          NO
-                                        /              \
-                                       ▼                ▼
-                         ┌───────────────────┐  ┌───────────────────┐
-                         │ Rain Suppression  │  │ Baseline Ambient  │
-                         │    (T * 0.2)      │  │    (T * 0.6)      │
-                         └───────────────────┘  └───────────────────┘
-                                       │                  │
-                                       └────────┬─────────┘
-                                                │
-                                                ▼
-                                  ┌──────────────────────────┐
-                                  │ Rolling Window Average   │ (3-Packet Smoothing)
-                                  └────────────┬─────────────┘
-                                               │
-                                               ▼
-                                  ┌──────────────────────────┐
-                                  │ Hard Boundary Clipping   │ (Integer 0 to 100)
-                                  └──────────────────────────┘
+                  ┌────────────────────────┐
+                  │    MongoDB Container   │  (Time-Series Data Lake)
+                  └────────────────────────┘
+                               ▲
+                               │ Reads Raw Streams
+                               │
+                  ┌────────────────────────┐
+                  │    FastAPI (main.py)   │  (Gateway / Inference Node)
+                  └────────────────────────┘
+                               │
+                               │ Exposes JSON REST Endpoints
+                               │ Streams RAM-Buffered Matplotlib/Seaborn
+                               ▼
+                  ┌────────────────────────┐
+                  │     React Frontend     │  (Leaflet GIS / Recharts Canvas)
+                  └────────────────────────
 
-* **Extreme Danger Window**: Spikes weights if temperatures exceed 38°C alongside humidity drops beneath 20%, heavily prioritizing temperature and wind speed multipliers.
-* **Rain Suppression**: Instantly slashes hazard risk coefficients down to a minimal fraction if active precipitation inputs are registered, introducing realistic natural fuel dampening effects.
-* **Rolling Smoothing**: Applies a 3-packet moving window average to simulate natural landscape drying latency rather than changing values instantly based on temporary ambient spikes.
-* **Boundary Clipping**: Uses NumPy constraints to enforce a standard operator threat scale from 0 (Absolute Safety) to 100 (Maximum Wildfire Threat).
+The Ingestion Worker (stream_worker.py): A standalone background process mimicking real-world IoT cellular forestry nodes. It continuously generates localized weather parameters specific to each park's micro-climate profile (including circadian day/night temperature cycles and randomized precipitation triggers) and writes payloads directly into MongoDB every 3 seconds.
 
----
+The Database Data Lake (MongoDB): A containerized database hosting time-series geospatial collections, completely independent of the web application layer.
 
-## 🚀 Local Installation & Deployment Guide
+The Gateway REST API Engine (main.py): Built with FastAPI. It performs database reads, sanitizes input variables via Pandas to handle data-type anomalies, and executes the rule-based prediction vectors. Additionally, it handles analytical rendering tasks directly inside an in-memory RAM buffer (io.BytesIO) to protect the server's hard drive from repetitive high-frequency writes.
 
-To deploy this multi-tier architecture locally, split your terminal workspace or utilize a multiplexer like `tmux`:
+The Client Control Deck (React): A single-page dashboard utilizing react-leaflet to project actual GPS points on an interactive OpenStreetMap layer and recharts to render smooth, real-time sliding timeline graphs.
 
-### 1. Initialize Database Container
-Spin up your containerized database image mapping default network ports:
-bash:
+⛰️ Tracked Real-Earth Coordinates
+The system tracks 5 high-risk wildlife reserves with precise physical geospatial points:
+
+Mudumalai National Park (Tamil Nadu) ── 11.5622° N, 76.5345° E
+
+Bandipur Tiger Reserve (Karnataka) ── 11.6640° N, 76.6291° E
+
+Anamalai Tiger Reserve (Tamil Nadu) ── 10.3950° N, 76.9647° E
+
+Wayanad Wildlife Sanctuary (Kerala) ── 11.6923° N, 76.2422° E
+
+Silent Valley National Park (Kerala) ── 11.1300° N, 76.4300° E
+
+🧠 The Mathematical Inference Engine
+Instead of using an opaque, heavy machine learning model that introduces system latency, risk indices are predicted dynamically using a deterministic, rule-based piecewise vector matrix tracking weather extremities:
+┌──────────────────────────┐
+                      │ Raw Telemetry Ingestion  │ (T, H, W, R)
+                      └────────────┬─────────────┘
+                                   │
+                                   ▼
+                   🌲 Are Conditions Extreme? 🌲
+                     (T >= 38°C  &  H <= 20%)
+                     /                        \
+                   YES                        NO
+                   /                            \
+                  ▼                              ▼
+     ┌────────────────────────┐     🌧️ Is Active Rain Falling? 🌧️
+     │ Extreme Danger Vector  │               (Rain > 0mm)
+     │ (T * 1.5) + (W * 0.5)  │               /          \
+     └────────────────────────┘             YES          NO
+                                            /              \
+                                           ▼                ▼
+                             ┌───────────────────┐  ┌───────────────────┐
+                             │ Rain Suppression  │  │ Baseline Ambient  │
+                             │    (T * 0.2)      │  │    (T * 0.6)      │
+                             └───────────────────┘  └───────────────────┘
+                                           │                  │
+                                           └────────┬─────────┘
+                                                    │
+                                                    ▼
+                                      ┌──────────────────────────┐
+                                      │ Rolling Window Average   │ (3-Packet Smoothing)
+                                      └────────────┬─────────────┘
+                                                   │
+                                                   ▼
+                                      ┌──────────────────────────┐
+                                      │ Hard Boundary Clipping   │ (Integer 0 to 100)
+                                      └──────────────────────────┘
+
+Extreme Danger Window: Spikes weights if temperatures exceed 38°C alongside humidity drops beneath 20%, heavily prioritizing temperature and wind speed multipliers.
+
+Rain Suppression: Instantly slashes hazard risk coefficients down to a minimal fraction if active precipitation inputs are registered, introducing realistic natural fuel dampening effects.
+
+Rolling Smoothing: Applies a 3-packet moving window average to simulate natural landscape drying latency rather than changing values instantly based on temporary ambient spikes.
+
+Boundary Clipping: Uses NumPy constraints to enforce a standard operator threat scale from 0 (Absolute Safety) to 100 (Maximum Wildfire Threat).
+
+
+
+🚀 Local Installation & Deployment Guide
+To deploy this multi-tier architecture locally, split your terminal workspace or utilize a multiplexer like tmux:
+1. Initialize Database Container
 docker run -d -p 27017:27017 --name local-mongo mongo:latest
-
-### 2. Launch Backend Analytics Cluster
-Initialize a secure Python virtual environment layer to protect system packages and start the pipeline nodes:
-
+2. Launch Backend Analytics Cluster
 cd backend
 python3 -m venv venv
 source venv/bin/activate
@@ -116,19 +113,28 @@ pip install -r requirements.txt
 
 # Start the live IoT sensor simulator worker
 python3 stream_worker.py
-
-# (In a separate terminal pane) Start the FastAPI web gateway router
+3. Start Web Gateway Server
+In a separate terminal pane, start the FastAPI web gateway router:
+cd backend
+source venv/bin/activate
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
-### 3. Launch Frontend Client UI
+
+4. Launch Frontend Client UI
 Compile dependencies and launch the localized Node server environment:
-bash:
 cd frontend
 npm install
 npm start
-
-
 Open your browser to http://localhost:3000 to interact with the system console canvas.
 
-Licensing & Project Scope
+📜 Licensing & Project Scope
 This project is shared under the official open-source MIT License. Built as a comprehensive systems engineering project demonstrating robust data extraction, cleaning pipelines, web socket rendering optimization, and geospatial dashboard tracking architectures.
+---
 
+### 🐙 Run the Final Push Sequence
+
+Save the file (`Ctrl + O`, `Enter`, `Ctrl + X`) and push the structural fixes up:
+
+```bash
+git add README.md
+git commit -m "fix: enclose text layouts into fenced block layers to clean up rendering errors"
+git push origin main
