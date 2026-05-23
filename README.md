@@ -33,6 +33,7 @@ The ecosystem relies on a decoupled, asynchronous microservice framework designe
                   ┌────────────────────────┐
                   │     React Frontend     │  (Leaflet GIS / Recharts Canvas)
                   └────────────────────────
+```
 
 The Ingestion Worker (stream_worker.py): A standalone background process mimicking real-world IoT cellular forestry nodes. It continuously generates localized weather parameters specific to each park's micro-climate profile (including circadian day/night temperature cycles and randomized precipitation triggers) and writes payloads directly into MongoDB every 3 seconds.
 
@@ -42,7 +43,7 @@ The Gateway REST API Engine (main.py): Built with FastAPI. It performs database 
 
 The Client Control Deck (React): A single-page dashboard utilizing react-leaflet to project actual GPS points on an interactive OpenStreetMap layer and recharts to render smooth, real-time sliding timeline graphs.
 
-⛰️ Tracked Real-Earth Coordinates
+## ⛰️ Tracked Real-Earth Coordinates
 The system tracks 5 high-risk wildlife reserves with precise physical geospatial points:
 
 Mudumalai National Park (Tamil Nadu) ── 11.5622° N, 76.5345° E
@@ -55,9 +56,10 @@ Wayanad Wildlife Sanctuary (Kerala) ── 11.6923° N, 76.2422° E
 
 Silent Valley National Park (Kerala) ── 11.1300° N, 76.4300° E
 
-🧠 The Mathematical Inference Engine
+## 🧠 The Mathematical Inference Engine
 Instead of using an opaque, heavy machine learning model that introduces system latency, risk indices are predicted dynamically using a deterministic, rule-based piecewise vector matrix tracking weather extremities:
-┌──────────────────────────┐
+``` text 
+                      ┌──────────────────────────┐
                       │ Raw Telemetry Ingestion  │ (T, H, W, R)
                       └────────────┬─────────────┘
                                    │
@@ -90,6 +92,7 @@ Instead of using an opaque, heavy machine learning model that introduces system 
                                       ┌──────────────────────────┐
                                       │ Hard Boundary Clipping   │ (Integer 0 to 100)
                                       └──────────────────────────┘
+```
 
 Extreme Danger Window: Spikes weights if temperatures exceed 38°C alongside humidity drops beneath 20%, heavily prioritizing temperature and wind speed multipliers.
 
@@ -101,7 +104,7 @@ Boundary Clipping: Uses NumPy constraints to enforce a standard operator threat 
 
 
 
-🚀 Local Installation & Deployment Guide
+## 🚀 Local Installation & Deployment Guide
 To deploy this multi-tier architecture locally, split your terminal workspace or utilize a multiplexer like tmux:
 1. Initialize Database Container
 docker run -d -p 27017:27017 --name local-mongo mongo:latest
@@ -126,15 +129,6 @@ npm install
 npm start
 Open your browser to http://localhost:3000 to interact with the system console canvas.
 
-📜 Licensing & Project Scope
+## 📜 Licensing & Project Scope
 This project is shared under the official open-source MIT License. Built as a comprehensive systems engineering project demonstrating robust data extraction, cleaning pipelines, web socket rendering optimization, and geospatial dashboard tracking architectures.
 ---
-
-### 🐙 Run the Final Push Sequence
-
-Save the file (`Ctrl + O`, `Enter`, `Ctrl + X`) and push the structural fixes up:
-
-```bash
-git add README.md
-git commit -m "fix: enclose text layouts into fenced block layers to clean up rendering errors"
-git push origin main
