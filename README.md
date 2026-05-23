@@ -107,28 +107,38 @@ Boundary Clipping: Uses NumPy constraints to enforce a standard operator threat 
 ## 🚀 Local Installation & Deployment Guide
 To deploy this multi-tier architecture locally, split your terminal workspace or utilize a multiplexer like tmux:
 1. Initialize Database Container
+``` text 
+bash
 docker run -d -p 27017:27017 --name local-mongo mongo:latest
+```
 2. Launch Backend Analytics Cluster
+``` text 
+bash
 cd backend
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
+```
 
-# Start the live IoT sensor simulator worker
+3. Start the live IoT sensor simulator worker
+``` text 
+bash
 python3 stream_worker.py
 3. Start Web Gateway Server
 In a separate terminal pane, start the FastAPI web gateway router:
 cd backend
 source venv/bin/activate
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
-
+```
 4. Launch Frontend Client UI
 Compile dependencies and launch the localized Node server environment:
+``` text 
+bash
 cd frontend
 npm install
 npm start
 Open your browser to http://localhost:3000 to interact with the system console canvas.
-
+```
 ## 📜 Licensing & Project Scope
 This project is shared under the official open-source MIT License. Built as a comprehensive systems engineering project demonstrating robust data extraction, cleaning pipelines, web socket rendering optimization, and geospatial dashboard tracking architectures.
 ---
